@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constants/colors";
+import { MOCK_CATEGORIES } from "../mocks/mockData";
 import { Expense } from "../types/expense";
 import { Card } from "./ui/Card";
 
@@ -11,10 +12,9 @@ interface ExpenseItemProps {
 }
 
 export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
-  const categoryColor =
-    Colors.expense[
-      expense.category.toLowerCase() as keyof typeof Colors.expense
-    ] || Colors.expense.other;
+  const category = MOCK_CATEGORIES.find((cat) => cat.name === expense.category);
+  const categoryColor = category?.color || Colors.expense.other;
+  const categoryIcon = category?.icon || "ellipsis-horizontal";
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -34,7 +34,7 @@ export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
             ]}
           >
             <Ionicons
-              name={getCategoryIcon(expense.category)}
+              name={categoryIcon as any}
               size={24}
               color={categoryColor}
             />
@@ -53,18 +53,6 @@ export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
       </Card>
     </TouchableOpacity>
   );
-}
-
-function getCategoryIcon(category: string): any {
-  const icons: Record<string, any> = {
-    Food: "fast-food",
-    Transport: "car",
-    Shopping: "cart",
-    Entertainment: "game-controller",
-    Bills: "receipt",
-    Other: "ellipsis-horizontal",
-  };
-  return icons[category] || "ellipsis-horizontal";
 }
 
 const styles = StyleSheet.create({

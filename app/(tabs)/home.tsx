@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   ScrollView,
@@ -8,14 +9,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ExpenseItem } from "../components/ExpenseItem";
-import { Card } from "../components/ui/Card";
-import { Colors } from "../constants/colors";
-import { useAuth } from "../contexts/AuthContext";
-import { MOCK_EXPENSES } from "../mocks/mockData";
+import { ExpenseItem } from "../../components/ExpenseItem";
+import { Card } from "../../components/ui/Card";
+import { Colors } from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
+import { MOCK_EXPENSES } from "../../mocks/mockData";
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const totalExpenses = MOCK_EXPENSES.reduce(
     (sum, expense) => sum + expense.amount,
@@ -111,12 +113,14 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Expenses</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/transactions")}
+            >
               <Text style={styles.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
 
-          {MOCK_EXPENSES.slice(0, 5).map((expense) => (
+          {MOCK_EXPENSES.slice(0, 3).map((expense) => (
             <ExpenseItem key={expense.id} expense={expense} />
           ))}
         </View>
@@ -239,12 +243,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomSpacing: {
-    height: 80,
+    height: 100,
   },
   fab: {
     position: "absolute",
     right: 24,
-    bottom: 24,
+    bottom: 80,
     width: 64,
     height: 64,
     borderRadius: 32,

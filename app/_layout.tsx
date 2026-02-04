@@ -15,7 +15,7 @@ function RootLayoutNav() {
     if (!user && !inAuthGroup) {
       router.replace("/login");
     } else if (user && inAuthGroup) {
-      router.replace("/home");
+      router.replace("/(tabs)/home");
     }
   }, [user, segments, isLoading]);
 
@@ -23,7 +23,7 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
-      <Stack.Screen name="home" />
+      <Stack.Screen name="(tabs)" />
       <Stack.Screen name="index" />
     </Stack>
   );

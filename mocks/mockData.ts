@@ -46,8 +46,8 @@ export const MOCK_EXPENSES: Expense[] = [
 export const TEST_USERS = [
   {
     id: "1",
-    email: "test@example.com",
-    password: "password123",
+    email: "test@test.com",
+    password: "123456",
     name: "Test User",
   },
   {

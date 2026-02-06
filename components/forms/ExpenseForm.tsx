@@ -14,6 +14,7 @@ import {
   CreateExpenseRequest,
   UpdateExpenseRequest,
 } from "../../lib/api/expenses";
+import { formatDateForMySQL } from "../../lib/utils/dateFormat";
 import { Expense } from "../../types/expense";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -86,7 +87,7 @@ export function ExpenseForm({
       title: title.trim(),
       amount: Number(amount),
       categoryId,
-      date: date.toISOString(),
+      date: formatDateForMySQL(date),
     };
 
     onSubmit(data);

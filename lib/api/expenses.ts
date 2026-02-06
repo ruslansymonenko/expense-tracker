@@ -47,23 +47,20 @@ export const expensesApi = {
   },
 
   async create(data: CreateExpenseRequest): Promise<Expense> {
-    const response = await apiClient.post<ExpenseResponse>("/expenses", data);
+    const response = await apiClient.post<Expense>("/expenses", data);
     return {
-      ...response.data.data,
-      amount: Number(response.data.data.amount),
-      date: new Date(response.data.data.date),
+      ...response.data,
+      amount: Number(response.data.amount),
+      date: new Date(response.data.date),
     };
   },
 
   async update(id: string, data: UpdateExpenseRequest): Promise<Expense> {
-    const response = await apiClient.put<ExpenseResponse>(
-      `/expenses/${id}`,
-      data,
-    );
+    const response = await apiClient.put<Expense>(`/expenses/${id}`, data);
     return {
-      ...response.data.data,
-      amount: Number(response.data.data.amount),
-      date: new Date(response.data.data.date),
+      ...response.data,
+      amount: Number(response.data.amount),
+      date: new Date(response.data.date),
     };
   },
 

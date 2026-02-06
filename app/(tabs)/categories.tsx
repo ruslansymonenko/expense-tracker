@@ -2,23 +2,41 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { CategoryForm } from "../../components/forms/CategoryForm";
 import { Card } from "../../components/ui/Card";
 import { Colors } from "../../constants/colors";
-import { useCategories } from "../../hooks/useCategories";
+import {
+  useCategories,
+  useCreateCategory,
+  useDeleteCategory,
+  useUpdateCategory,
+} from "../../hooks/useCategories";
 import { useExpenses } from "../../hooks/useExpenses";
+import {
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from "../../lib/api/categories";
 import { Category } from "../../types/category";
 
 export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: expenses, isLoading: expensesLoading } = useExpenses();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
 
   const isLoading = categoriesLoading || expensesLoading;
 
@@ -37,6 +55,71 @@ export default function CategoriesPage() {
     );
   };
 
+  const handleAddCategory = () => {
+    setEditingCategory(null);
+    setModalVisible(true);
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setModalVisible(true);
+  };
+
+  const handleDeleteCategory = (category: Category) => {
+    const count = getCategoryCount(category.id);
+
+    if (count > 0) {
+      Alert.alert(
+        "Cannot Delete Category",
+        `This category has ${count} transaction${count === 1 ? "" : "s"}. Please reassign or delete those transactions first.`,
+        [{ text: "OK" }],
+      );
+      return;
+    }
+
+    Alert.alert(
+      "Delete Category",
+      `Are you sure you want to delete "${category.name}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteCategory.mutate(category.id);
+          },
+        },
+      ],
+    );
+  };
+
+  const handleSubmitCategory = (
+    data: CreateCategoryRequest | UpdateCategoryRequest,
+  ) => {
+    if (editingCategory) {
+      updateCategory.mutate(
+        { id: editingCategory.id, data },
+        {
+          onSuccess: () => {
+            setModalVisible(false);
+            setEditingCategory(null);
+          },
+        },
+      );
+    } else {
+      createCategory.mutate(data as CreateCategoryRequest, {
+        onSuccess: () => {
+          setModalVisible(false);
+        },
+      });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setEditingCategory(null);
+  };
+
   const renderCategoryItem = ({ item }: { item: Category }) => {
     const total = getCategoryTotal(item.id);
     const count = getCategoryCount(item.id);
@@ -45,6 +128,7 @@ export default function CategoriesPage() {
     return (
       <TouchableOpacity
         onPress={() => setSelectedCategory(isSelected ? null : item.id)}
+        onLongPress={() => handleEditCategory(item)}
         activeOpacity={0.7}
       >
         <Card
@@ -67,6 +151,24 @@ export default function CategoriesPage() {
               <Text style={styles.categoryCount}>
                 {count} transaction{count === 1 ? "" : "s"}
               </Text>
+            </View>
+            <View style={styles.categoryActions}>
+              <TouchableOpacity
+                style={styles.actionIcon}
+                onPress={() => handleEditCategory(item)}
+              >
+                <Ionicons
+                  name="create-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.actionIcon}
+                onPress={() => handleDeleteCategory(item)}
+              >
+                <Ionicons name="trash-outline" size={20} color={Colors.error} />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -113,7 +215,7 @@ export default function CategoriesPage() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Categories</Text>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
           <Ionicons name="add-circle" size={28} color={Colors.primary} />
         </TouchableOpacity>
       </View>
@@ -143,6 +245,33 @@ export default function CategoriesPage() {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={handleCloseModal}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={handleCloseModal}>
+              <Ionicons name="close" size={28} color={Colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {editingCategory ? "Edit Category" : "Add Category"}
+            </Text>
+            <View style={{ width: 28 }} />
+          </View>
+          <CategoryForm
+            initialData={editingCategory || undefined}
+            onSubmit={handleSubmitCategory}
+            isLoading={createCategory.isPending || updateCategory.isPending}
+            submitLabel={
+              editingCategory ? "Update Category" : "Create Category"
+            }
+          />
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -236,6 +365,13 @@ const styles = StyleSheet.create({
   categoryInfo: {
     flex: 1,
   },
+  categoryActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  actionIcon: {
+    padding: 8,
+  },
   categoryName: {
     fontSize: 18,
     fontWeight: "bold",
@@ -273,5 +409,23 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: Colors.textSecondary,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: Colors.text,
   },
 });

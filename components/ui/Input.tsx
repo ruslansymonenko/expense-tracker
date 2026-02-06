@@ -12,22 +12,27 @@ interface InputProps extends TextInputProps {
   readonly label?: string;
   readonly error?: string;
   readonly icon?: React.ReactNode;
+  readonly leftIcon?: React.ReactNode;
 }
 
 export function Input({
   label,
   error,
   icon,
+  leftIcon,
   style,
   ...props
 }: Readonly<InputProps>) {
+  const hasIcon = icon || leftIcon;
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={[styles.inputContainer, error && styles.inputError]}>
-        {icon && <View style={styles.iconContainer}>{icon}</View>}
+        {(leftIcon || icon) && (
+          <View style={styles.iconContainer}>{leftIcon || icon}</View>
+        )}
         <TextInput
-          style={[styles.input, icon ? styles.inputWithIcon : null, style]}
+          style={[styles.input, hasIcon ? styles.inputWithIcon : null, style]}
           placeholderTextColor={Colors.textLight}
           {...props}
         />

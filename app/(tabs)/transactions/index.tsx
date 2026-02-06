@@ -109,6 +109,14 @@ export default function TransactionsPage() {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => router.push("/(tabs)/transactions/add" as any)}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="add" size={28} color={Colors.surface} />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -205,5 +213,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     textAlign: "center",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: Colors.shadow.color,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });

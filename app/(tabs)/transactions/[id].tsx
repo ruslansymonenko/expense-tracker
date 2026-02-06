@@ -80,7 +80,7 @@ export default function TransactionDetailsPage() {
   };
 
   const handleEdit = () => {
-    Alert.alert("Edit", "Edit functionality coming soon!");
+    router.push(`/(tabs)/transactions/edit?id=${id}` as any);
   };
 
   const handleDelete = () => {
@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
+    marginLeft: 8,
     alignItems: "center",
     justifyContent: "center",
   },

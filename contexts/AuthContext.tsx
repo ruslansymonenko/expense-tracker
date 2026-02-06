@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
   useContext,
@@ -17,6 +18,7 @@ export function AuthProvider({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     loadUser();
@@ -43,6 +45,9 @@ export function AuthProvider({
 
     try {
       const response = await authApi.login({ email, password });
+
+      queryClient.clear();
+
       setUser(response.user);
     } catch (error: any) {
       const errorMessage =
@@ -64,6 +69,9 @@ export function AuthProvider({
 
     try {
       const response = await authApi.register({ email, name, password });
+
+      queryClient.clear();
+
       setUser(response.user);
     } catch (error: any) {
       const errorMessage =
@@ -77,6 +85,8 @@ export function AuthProvider({
   const logout = async () => {
     await authApi.logout();
     setUser(null);
+
+    queryClient.clear();
   };
 
   const value = useMemo(

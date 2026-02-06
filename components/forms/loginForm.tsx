@@ -2,47 +2,39 @@ import { useAuth } from "@/contexts/AuthContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { Button } from "../../components/ui/Button";
 import { Colors } from "../../constants/colors";
 import { Input } from "../ui/Input";
 
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 interface Props {}
 
 export const LoginForm: React.FC<Props> = (props) => {
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {},
-  );
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleLogin = async () => {
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     try {
-      await login(email, password);
+      await login(data.email, data.password);
     } catch (error) {
       Alert.alert("Login Failed", (error as Error).message);
     } finally {
@@ -50,46 +42,72 @@ export const LoginForm: React.FC<Props> = (props) => {
     }
   };
 
-  const router = useRouter();
-
   return (
     <View style={styles.form}>
-      <Input
-        label="Email"
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={setEmail}
-        error={errors.email}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        icon={
-          <Ionicons
-            name="mail-outline"
-            size={20}
-            color={Colors.textSecondary}
+      <Controller
+        control={control}
+        name="email"
+        rules={{
+          required: "Email is required",
+          pattern: {
+            value: /\S+@\S+\.\S+/,
+            message: "Email is invalid",
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            label="Email"
+            placeholder="Enter your email"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            error={errors.email?.message}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            icon={
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={Colors.textSecondary}
+              />
+            }
           />
-        }
+        )}
       />
 
-      <Input
-        label="Password"
-        placeholder="Enter your password"
-        value={password}
-        onChangeText={setPassword}
-        error={errors.password}
-        secureTextEntry
-        icon={
-          <Ionicons
-            name="lock-closed-outline"
-            size={20}
-            color={Colors.textSecondary}
+      <Controller
+        control={control}
+        name="password"
+        rules={{
+          required: "Password is required",
+          minLength: {
+            value: 6,
+            message: "Password must be at least 6 characters",
+          },
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            label="Password"
+            placeholder="Enter your password"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            error={errors.password?.message}
+            secureTextEntry
+            icon={
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color={Colors.textSecondary}
+              />
+            }
           />
-        }
+        )}
       />
 
       <Button
         title="Login"
-        onPress={handleLogin}
+        onPress={handleSubmit(onSubmit)}
         loading={loading}
         style={styles.loginButton}
       />

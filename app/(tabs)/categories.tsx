@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -10,26 +11,35 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../components/ui/Card";
 import { Colors } from "../../constants/colors";
-import { MOCK_CATEGORIES, MOCK_EXPENSES } from "../../mocks/mockData";
+import { useCategories } from "../../hooks/useCategories";
+import { useExpenses } from "../../hooks/useExpenses";
 import { Category } from "../../types/category";
 
 export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: expenses, isLoading: expensesLoading } = useExpenses();
 
-  const getCategoryTotal = (categoryName: string) => {
-    return MOCK_EXPENSES.filter(
-      (expense) => expense.category === categoryName,
-    ).reduce((sum, expense) => sum + expense.amount, 0);
+  const isLoading = categoriesLoading || expensesLoading;
+
+  const getCategoryTotal = (categoryId: string) => {
+    return (
+      expenses
+        ?.filter((expense) => expense.categoryId === categoryId)
+        .reduce((sum, expense) => sum + expense.amount, 0) ?? 0
+    );
   };
 
-  const getCategoryCount = (categoryName: string) => {
-    return MOCK_EXPENSES.filter((expense) => expense.category === categoryName)
-      .length;
+  const getCategoryCount = (categoryId: string) => {
+    return (
+      expenses?.filter((expense) => expense.categoryId === categoryId).length ??
+      0
+    );
   };
 
   const renderCategoryItem = ({ item }: { item: Category }) => {
-    const total = getCategoryTotal(item.name);
-    const count = getCategoryCount(item.name);
+    const total = getCategoryTotal(item.id);
+    const count = getCategoryCount(item.id);
     const isSelected = selectedCategory === item.id;
 
     return (
@@ -64,7 +74,7 @@ export default function CategoriesPage() {
             <Text style={[styles.categoryAmount, { color: item.color }]}>
               ${total.toFixed(2)}
             </Text>
-            {total > 0 && (
+            {total > 0 && totalExpenses > 0 && (
               <View
                 style={[
                   styles.percentageBadge,
@@ -72,12 +82,7 @@ export default function CategoriesPage() {
                 ]}
               >
                 <Text style={[styles.percentageText, { color: item.color }]}>
-                  {(
-                    (total /
-                      MOCK_EXPENSES.reduce((sum, e) => sum + e.amount, 0)) *
-                    100
-                  ).toFixed(1)}
-                  %
+                  {((total / totalExpenses) * 100).toFixed(1)}%
                 </Text>
               </View>
             )}
@@ -87,10 +92,22 @@ export default function CategoriesPage() {
     );
   };
 
-  const totalExpenses = MOCK_EXPENSES.reduce(
-    (sum, expense) => sum + expense.amount,
-    0,
-  );
+  const totalExpenses =
+    expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Categories</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>Loading categories...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,7 +123,7 @@ export default function CategoriesPage() {
           <View style={styles.summaryItem}>
             <Ionicons name="apps" size={24} color={Colors.primary} />
             <Text style={styles.summaryLabel}>Categories</Text>
-            <Text style={styles.summaryValue}>{MOCK_CATEGORIES.length}</Text>
+            <Text style={styles.summaryValue}>{categories?.length ?? 0}</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
@@ -120,7 +137,7 @@ export default function CategoriesPage() {
       </View>
 
       <FlatList
-        data={MOCK_CATEGORIES}
+        data={categories}
         renderItem={renderCategoryItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
@@ -246,5 +263,15 @@ const styles = StyleSheet.create({
   percentageText: {
     fontSize: 14,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
   },
 });

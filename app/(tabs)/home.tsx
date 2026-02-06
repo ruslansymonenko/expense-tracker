@@ -4,22 +4,34 @@ import { HomeHeader } from "@/components/blocks/HomeHeader";
 import { HomeSummary } from "@/components/blocks/HomeSummary";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "../../constants/colors";
 import { useAuth } from "../../contexts/AuthContext";
-import { MOCK_EXPENSES } from "../../mocks/mockData";
+import { useExpenses } from "../../hooks/useExpenses";
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
+  const { data: expenses, isLoading, error } = useExpenses();
 
-  const totalExpenses = MOCK_EXPENSES.reduce(
-    (sum, expense) => sum + expense.amount,
-    0,
-  );
-  const thisMonthExpenses = MOCK_EXPENSES.filter(
-    (expense) => new Date(expense.date).getMonth() === new Date().getMonth(),
-  ).reduce((sum, expense) => sum + expense.amount, 0);
+  const totalExpenses =
+    expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+
+  const thisMonthExpenses =
+    expenses
+      ?.filter((expense) => {
+        const expenseDate =
+          expense.date instanceof Date ? expense.date : new Date(expense.date);
+        return expenseDate.getMonth() === new Date().getMonth();
+      })
+      .reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,7 +45,26 @@ export default function HomeScreen() {
 
         <HomeActions />
 
-        <HomeExpenses expenses={MOCK_EXPENSES} />
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>Loading expenses...</Text>
+          </View>
+        )}
+
+        {!isLoading && error && (
+          <View style={styles.errorContainer}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={48}
+              color={Colors.error}
+            />
+            <Text style={styles.errorText}>Failed to load expenses</Text>
+            <Text style={styles.errorSubText}>{error.message}</Text>
+          </View>
+        )}
+
+        {!isLoading && !error && <HomeExpenses expenses={expenses || []} />}
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -72,5 +103,34 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 60,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    color: Colors.text,
+  },
+  errorSubText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: "center",
   },
 });

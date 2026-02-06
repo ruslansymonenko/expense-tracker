@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constants/colors";
-import { MOCK_CATEGORIES } from "../mocks/mockData";
+import { useCategories } from "../hooks/useCategories";
 import { Expense } from "../types/expense";
 import { Card } from "./ui/Card";
 
@@ -12,12 +12,16 @@ interface ExpenseItemProps {
 }
 
 export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
-  const category = MOCK_CATEGORIES.find((cat) => cat.name === expense.category);
-  const categoryColor = category?.color || Colors.expense.other;
-  const categoryIcon = category?.icon || "ellipsis-horizontal";
+  const { data: categories } = useCategories();
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
+  const category = categories?.find((cat) => cat.id === expense.categoryId);
+  const categoryColor = category?.color || Colors.expense.other;
+  const categoryIcon = (category?.icon || "ellipsis-horizontal") as any;
+  const categoryName = category?.name || expense.category || "Other";
+
+  const formatDate = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
@@ -33,16 +37,12 @@ export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
               { backgroundColor: categoryColor + "20" },
             ]}
           >
-            <Ionicons
-              name={categoryIcon as any}
-              size={24}
-              color={categoryColor}
-            />
+            <Ionicons name={categoryIcon} size={24} color={categoryColor} />
           </View>
 
           <View style={styles.details}>
             <Text style={styles.title}>{expense.title}</Text>
-            <Text style={styles.category}>{expense.category}</Text>
+            <Text style={styles.category}>{categoryName}</Text>
             <Text style={styles.date}>{formatDate(expense.date)}</Text>
           </View>
 

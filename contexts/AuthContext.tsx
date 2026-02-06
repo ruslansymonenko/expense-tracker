@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { TEST_USERS } from "../mocks/mockData";
+import { authApi } from "../lib/api/auth";
 import { AuthContextType, User } from "../types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,26 +19,41 @@ export function AuthProvider({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(false);
+    // Check if user is already logged in on mount
+    loadUser();
   }, []);
+
+  const loadUser = async () => {
+    try {
+      setIsLoading(true);
+      const currentUser = await authApi.getCurrentUser();
+      const token = await authApi.getToken();
+
+      if (currentUser && token) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      console.error("Error loading user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const login = async (email: string, password: string): Promise<void> => {
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const foundUser = TEST_USERS.find(
-      (u) => u.email === email && u.password === password,
-    );
-
-    if (!foundUser) {
+    try {
+      const response = await authApi.login({ email, password });
+      setUser(response.user);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Invalid email or password";
+      throw new Error(errorMessage);
+    } finally {
       setIsLoading(false);
-      throw new Error("Invalid email or password");
     }
-
-    const { password: _, ...userWithoutPassword } = foundUser;
-    setUser(userWithoutPassword);
-    setIsLoading(false);
   };
 
   const register = async (
@@ -48,32 +63,26 @@ export function AuthProvider({
   ): Promise<void> => {
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const existingUser = TEST_USERS.find((u) => u.email === email);
-    if (existingUser) {
+    try {
+      const response = await authApi.register({ email, name, password });
+      setUser(response.user);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Registration failed";
+      throw new Error(errorMessage);
+    } finally {
       setIsLoading(false);
-      throw new Error("Email already exists");
     }
-
-    const newUser: User = {
-      id: Date.now().toString(),
-      email,
-      name,
-    };
-
-    TEST_USERS.push({ ...newUser, password });
-    setUser(newUser);
-    setIsLoading(false);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await authApi.logout();
     setUser(null);
   };
 
   const value = useMemo(
     () => ({ user, isLoading, login, register, logout }),
-    [user, isLoading, login, register, logout],
+    [user, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

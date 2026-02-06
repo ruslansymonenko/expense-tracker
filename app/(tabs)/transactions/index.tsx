@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -11,44 +12,80 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ExpenseItem } from "../../../components/ExpenseItem";
 import { Colors } from "../../../constants/colors";
-import { MOCK_EXPENSES } from "../../../mocks/mockData";
+import { useExpenses } from "../../../hooks/useExpenses";
 
 export default function TransactionsPage() {
   const router = useRouter();
+  const { data: expenses, isLoading, error } = useExpenses();
 
   const handleTransactionPress = (id: string) => {
     router.push(`/(tabs)/transactions/${id}` as any);
   };
+
+  const thisMonthCount =
+    expenses?.filter((e) => {
+      const expenseDate = e.date instanceof Date ? e.date : new Date(e.date);
+      return expenseDate.getMonth() === new Date().getMonth();
+    }).length ?? 0;
+
+  const totalAmount = expenses?.reduce((sum, e) => sum + e.amount, 0) ?? 0;
 
   const renderHeader = () => (
     <>
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
           <Text style={styles.statLabel}>Total</Text>
-          <Text style={styles.statValue}>{MOCK_EXPENSES.length}</Text>
+          <Text style={styles.statValue}>{expenses?.length ?? 0}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
           <Text style={styles.statLabel}>This Month</Text>
-          <Text style={styles.statValue}>
-            {
-              MOCK_EXPENSES.filter(
-                (e) => new Date(e.date).getMonth() === new Date().getMonth(),
-              ).length
-            }
-          </Text>
+          <Text style={styles.statValue}>{thisMonthCount}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.statItem}>
           <Text style={styles.statLabel}>Amount</Text>
           <Text style={[styles.statValue, { color: Colors.primary }]}>
-            ${MOCK_EXPENSES.reduce((sum, e) => sum + e.amount, 0).toFixed(0)}
+            ${totalAmount.toFixed(0)}
           </Text>
         </View>
       </View>
       <Text style={styles.sectionTitle}>All Transactions</Text>
     </>
   );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Transactions</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>Loading transactions...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Transactions</Text>
+        </View>
+        <View style={styles.errorContainer}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={48}
+            color={Colors.error}
+          />
+          <Text style={styles.errorText}>Failed to load transactions</Text>
+          <Text style={styles.errorSubText}>{error.message}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,7 +97,7 @@ export default function TransactionsPage() {
       </View>
 
       <FlatList
-        data={MOCK_EXPENSES}
+        data={expenses}
         renderItem={({ item }) => (
           <ExpenseItem
             expense={item}
@@ -140,5 +177,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.text,
     marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    color: Colors.text,
+  },
+  errorSubText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: "center",
   },
 });

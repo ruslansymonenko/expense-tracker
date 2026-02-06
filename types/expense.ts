@@ -2,8 +2,9 @@ export interface Expense {
   id: string;
   title: string;
   amount: number;
-  category: string;
-  date: Date;
+  categoryId: string;
+  category?: string; // For display purposes, will be populated from categoryId
+  date: Date | string;
   userId: string;
 }
 

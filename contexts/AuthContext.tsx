@@ -19,7 +19,6 @@ export function AuthProvider({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in on mount
     loadUser();
   }, []);
 

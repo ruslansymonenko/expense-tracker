@@ -16,7 +16,7 @@ export interface CreateExpenseRequest {
   title: string;
   amount: number;
   categoryId: string;
-  date: string; // ISO string
+  date: string;
 }
 
 export interface UpdateExpenseRequest {
@@ -29,9 +29,10 @@ export interface UpdateExpenseRequest {
 export const expensesApi = {
   async getAll(): Promise<Expense[]> {
     const response = await apiClient.get<ExpensesResponse>("/expenses");
-    // Convert date strings to Date objects
+
     return response.data.data.map((expense) => ({
       ...expense,
+      amount: Number(expense.amount),
       date: new Date(expense.date),
     }));
   },
@@ -40,6 +41,7 @@ export const expensesApi = {
     const response = await apiClient.get<ExpenseResponse>(`/expenses/${id}`);
     return {
       ...response.data.data,
+      amount: Number(response.data.data.amount),
       date: new Date(response.data.data.date),
     };
   },
@@ -48,6 +50,7 @@ export const expensesApi = {
     const response = await apiClient.post<ExpenseResponse>("/expenses", data);
     return {
       ...response.data.data,
+      amount: Number(response.data.data.amount),
       date: new Date(response.data.data.date),
     };
   },
@@ -59,6 +62,7 @@ export const expensesApi = {
     );
     return {
       ...response.data.data,
+      amount: Number(response.data.data.amount),
       date: new Date(response.data.data.date),
     };
   },

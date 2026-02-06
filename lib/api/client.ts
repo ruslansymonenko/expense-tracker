@@ -12,7 +12,6 @@ export const apiClient = axios.create({
   timeout: API_CONFIG.TIMEOUT,
 });
 
-// Request interceptor to add auth token
 apiClient.interceptors.request.use(
   async (config) => {
     try {
@@ -30,16 +29,12 @@ apiClient.interceptors.request.use(
   },
 );
 
-// Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, clear storage
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("user");
-      // You might want to navigate to login here
-      // But we'll handle this in the AuthContext
     }
     throw error;
   },

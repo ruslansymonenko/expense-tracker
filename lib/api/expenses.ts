@@ -38,11 +38,11 @@ export const expensesApi = {
   },
 
   async getById(id: string): Promise<Expense> {
-    const response = await apiClient.get<ExpenseResponse>(`/expenses/${id}`);
+    const response = await apiClient.get<Expense>(`/expenses/${id}`);
     return {
-      ...response.data.data,
-      amount: Number(response.data.data.amount),
-      date: new Date(response.data.data.date),
+      ...response.data,
+      amount: Number(response.data.amount),
+      date: new Date(response.data.date),
     };
   },
 

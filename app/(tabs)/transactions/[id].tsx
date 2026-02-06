@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -12,15 +13,28 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../../components/ui/Card";
 import { Colors } from "../../../constants/colors";
-import { MOCK_CATEGORIES, MOCK_EXPENSES } from "../../../mocks/mockData";
+import { useCategories } from "../../../hooks/useCategories";
+import { useDeleteExpense, useExpense } from "../../../hooks/useExpenses";
 
 export default function TransactionDetailsPage() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
-  const transaction = MOCK_EXPENSES.find((exp) => exp.id === id);
+  const { data: transaction, isLoading, error } = useExpense(id as string);
+  const { data: categories } = useCategories();
+  const deleteExpense = useDeleteExpense();
 
-  if (!transaction) {
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !transaction) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
@@ -29,7 +43,9 @@ export default function TransactionDetailsPage() {
             size={64}
             color={Colors.textSecondary}
           />
-          <Text style={styles.errorText}>Transaction not found</Text>
+          <Text style={styles.errorText}>
+            {error ? "Failed to load transaction" : "Transaction not found"}
+          </Text>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
@@ -41,14 +57,13 @@ export default function TransactionDetailsPage() {
     );
   }
 
-  const category = MOCK_CATEGORIES.find(
-    (cat) => cat.name === transaction.category,
-  );
+  const category = categories?.find((cat) => cat.id === transaction.categoryId);
   const categoryColor = category?.color || Colors.expense.other;
-  const categoryIcon = category?.icon || "ellipsis-horizontal";
+  const categoryIcon = (category?.icon || "ellipsis-horizontal") as any;
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
+  const formatDate = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -56,8 +71,9 @@ export default function TransactionDetailsPage() {
     });
   };
 
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString("en-US", {
+  const formatTime = (date: Date | string) => {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -77,7 +93,11 @@ export default function TransactionDetailsPage() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            router.back();
+            deleteExpense.mutate(id as string, {
+              onSuccess: () => {
+                router.back();
+              },
+            });
           },
         },
       ],
@@ -112,7 +132,9 @@ export default function TransactionDetailsPage() {
                   color={categoryColor}
                 />
               </View>
-              <Text style={styles.detailValue}>{transaction.category}</Text>
+              <Text style={styles.detailValue}>
+                {category?.name || "Other"}
+              </Text>
             </View>
           </View>
         </Card>
@@ -187,6 +209,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorContainer: {
     flex: 1,

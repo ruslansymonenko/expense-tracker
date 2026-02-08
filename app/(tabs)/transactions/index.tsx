@@ -1,5 +1,6 @@
 import { ExpenseItem } from "@/components/ExpenseItem";
 import { Colors } from "@/constants/colors";
+import { useCategories } from "@/hooks/useCategories";
 import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -17,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function TransactionsPage() {
   const router = useRouter();
   const { data: expenses, isLoading, error } = useExpenses();
+  const { data: categories } = useCategories();
 
   const handleTransactionPress = (id: string) => {
     router.push(`/(tabs)/transactions/${id}` as any);
@@ -101,6 +103,7 @@ export default function TransactionsPage() {
         renderItem={({ item }) => (
           <ExpenseItem
             expense={item}
+            categories={categories}
             onPress={() => handleTransactionPress(item.id)}
           />
         )}

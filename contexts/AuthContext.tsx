@@ -1,4 +1,6 @@
+import { CATEGORIES_QUERY_KEY } from "@/hooks/useCategories";
 import { authApi } from "@/lib/api/auth";
+import { categoriesApi } from "@/lib/api/categories";
 import { AuthContextType, User } from "@/types/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import React, {
@@ -49,6 +51,12 @@ export function AuthProvider({
       queryClient.clear();
 
       setUser(response.user);
+
+      // Prefetch categories for better UX
+      queryClient.prefetchQuery({
+        queryKey: CATEGORIES_QUERY_KEY,
+        queryFn: () => categoriesApi.getAll(),
+      });
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
@@ -73,6 +81,12 @@ export function AuthProvider({
       queryClient.clear();
 
       setUser(response.user);
+
+      // Prefetch categories for better UX
+      queryClient.prefetchQuery({
+        queryKey: CATEGORIES_QUERY_KEY,
+        queryFn: () => categoriesApi.getAll(),
+      });
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || "Registration failed";

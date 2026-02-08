@@ -1,59 +1,66 @@
 import { Card } from "@/components/ui/Card";
 import { Colors } from "@/constants/colors";
-import { useCategories } from "@/hooks/useCategories";
+import { Category } from "@/types/category";
 import { Expense } from "@/types/expense";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ExpenseItemProps {
   readonly expense: Expense;
+  readonly categories?: Category[];
   readonly onPress?: () => void;
 }
 
-export function ExpenseItem({ expense, onPress }: ExpenseItemProps) {
-  const { data: categories } = useCategories();
+export const ExpenseItem = React.memo(
+  ({ expense, categories, onPress }: ExpenseItemProps) => {
+    const category = useMemo(
+      () => categories?.find((cat) => cat.id === expense.categoryId),
+      [categories, expense.categoryId],
+    );
 
-  const category = categories?.find((cat) => cat.id === expense.categoryId);
-  const categoryColor = category?.color || Colors.expense.other;
-  const categoryIcon = (category?.icon || "ellipsis-horizontal") as any;
-  const categoryName = category?.name || expense.category || "Other";
+    const categoryColor = category?.color || Colors.expense.other;
+    const categoryIcon = (category?.icon || "ellipsis-horizontal") as any;
+    const categoryName = category?.name || expense.category || "Other";
 
-  const formatDate = (date: Date | string) => {
-    const dateObj = date instanceof Date ? date : new Date(date);
-    return dateObj.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
+    const formatDate = (date: Date | string) => {
+      const dateObj = date instanceof Date ? date : new Date(date);
+      return dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+    };
 
-  return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-      <Card style={styles.card}>
-        <View style={styles.content}>
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: categoryColor + "20" },
-            ]}
-          >
-            <Ionicons name={categoryIcon} size={24} color={categoryColor} />
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <Card style={styles.card}>
+          <View style={styles.content}>
+            <View
+              style={[
+                styles.iconContainer,
+                { backgroundColor: categoryColor + "20" },
+              ]}
+            >
+              <Ionicons name={categoryIcon} size={24} color={categoryColor} />
+            </View>
+
+            <View style={styles.details}>
+              <Text style={styles.title}>{expense.title}</Text>
+              <Text style={styles.category}>{categoryName}</Text>
+              <Text style={styles.date}>{formatDate(expense.date)}</Text>
+            </View>
+
+            <View style={styles.amountContainer}>
+              <Text style={styles.amount}>-${expense.amount.toFixed(2)}</Text>
+            </View>
           </View>
+        </Card>
+      </TouchableOpacity>
+    );
+  },
+);
 
-          <View style={styles.details}>
-            <Text style={styles.title}>{expense.title}</Text>
-            <Text style={styles.category}>{categoryName}</Text>
-            <Text style={styles.date}>{formatDate(expense.date)}</Text>
-          </View>
-
-          <View style={styles.amountContainer}>
-            <Text style={styles.amount}>-${expense.amount.toFixed(2)}</Text>
-          </View>
-        </View>
-      </Card>
-    </TouchableOpacity>
-  );
-}
+ExpenseItem.displayName = "ExpenseItem";
 
 const styles = StyleSheet.create({
   card: {

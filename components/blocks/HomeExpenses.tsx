@@ -1,5 +1,6 @@
 import { ExpenseItem } from "@/components/ExpenseItem";
 import { Colors } from "@/constants/colors";
+import { Category } from "@/types/category";
 import { Expense } from "@/types/expense";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -7,26 +8,35 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   expenses: Expense[];
+  categories?: Category[];
 }
 
-export const HomeExpenses: React.FC<Props> = ({ expenses }) => {
-  const router = useRouter();
+export const HomeExpenses: React.FC<Props> = React.memo(
+  ({ expenses, categories }) => {
+    const router = useRouter();
 
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Expenses</Text>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/transactions")}>
-          <Text style={styles.seeAll}>See All</Text>
-        </TouchableOpacity>
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Recent Expenses</Text>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/transactions")}>
+            <Text style={styles.seeAll}>See All</Text>
+          </TouchableOpacity>
+        </View>
+
+        {expenses.slice(0, 3).map((expense) => (
+          <ExpenseItem
+            key={expense.id}
+            expense={expense}
+            categories={categories}
+          />
+        ))}
       </View>
+    );
+  },
+);
 
-      {expenses.slice(0, 3).map((expense) => (
-        <ExpenseItem key={expense.id} expense={expense} />
-      ))}
-    </View>
-  );
-};
+HomeExpenses.displayName = "HomeExpenses";
 
 export const styles = StyleSheet.create({
   container: {

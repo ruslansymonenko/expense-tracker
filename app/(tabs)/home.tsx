@@ -4,10 +4,11 @@ import { HomeHeader } from "@/components/blocks/HomeHeader";
 import { HomeSummary } from "@/components/blocks/HomeSummary";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCategories } from "@/hooks/useCategories";
 import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -21,18 +22,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const { data: expenses, isLoading, error } = useExpenses();
+  const { data: categories } = useCategories();
 
-  const totalExpenses =
-    expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+  const totalExpenses = useMemo(
+    () => expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0,
+    [expenses],
+  );
 
-  const thisMonthExpenses =
-    expenses
-      ?.filter((expense) => {
-        const expenseDate =
-          expense.date instanceof Date ? expense.date : new Date(expense.date);
-        return expenseDate.getMonth() === new Date().getMonth();
-      })
-      .reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+  const thisMonthExpenses = useMemo(
+    () =>
+      expenses
+        ?.filter((expense) => {
+          const expenseDate =
+            expense.date instanceof Date
+              ? expense.date
+              : new Date(expense.date);
+          return expenseDate.getMonth() === new Date().getMonth();
+        })
+        .reduce((sum, expense) => sum + expense.amount, 0) ?? 0,
+    [expenses],
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -65,7 +74,9 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {!isLoading && !error && <HomeExpenses expenses={expenses || []} />}
+        {!isLoading && !error && (
+          <HomeExpenses expenses={expenses || []} categories={categories} />
+        )}
 
         <View style={styles.bottomSpacing} />
       </ScrollView>

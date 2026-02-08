@@ -1,7 +1,7 @@
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { AuthProvider, useAuth } from "../contexts/AuthContext";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,6 +29,7 @@ function RootLayoutNav() {
     } else if (user && inAuthGroup) {
       router.replace("/(tabs)/home");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, segments, isLoading]);
 
   return (

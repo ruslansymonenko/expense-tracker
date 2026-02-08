@@ -1,3 +1,6 @@
+import { ExpenseItem } from "@/components/ExpenseItem";
+import { Colors } from "@/constants/colors";
+import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -10,9 +13,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ExpenseItem } from "../../../components/ExpenseItem";
-import { Colors } from "../../../constants/colors";
-import { useExpenses } from "../../../hooks/useExpenses";
 
 export default function TransactionsPage() {
   const router = useRouter();

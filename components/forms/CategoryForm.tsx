@@ -1,3 +1,11 @@
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Colors } from "@/constants/colors";
+import {
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from "@/lib/api/categories";
+import { Category } from "@/types/category";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -7,14 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors } from "../../constants/colors";
-import {
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from "../../lib/api/categories";
-import { Category } from "../../types/category";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
 
 interface CategoryFormProps {
   readonly initialData?: Category;

@@ -1,6 +1,6 @@
+import { API_CONFIG } from "@/constants/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { API_CONFIG } from "../../constants/config";
 
 export const BASE_URL = API_CONFIG.BASE_URL;
 

@@ -1,14 +1,11 @@
+import { ExpenseForm } from "@/components/forms/ExpenseForm";
+import { Colors } from "@/constants/colors";
+import { useCreateExpense } from "@/hooks/useExpenses";
+import { CreateExpenseRequest, UpdateExpenseRequest } from "@/lib/api/expenses";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ExpenseForm } from "../../../components/forms/ExpenseForm";
-import { Colors } from "../../../constants/colors";
-import { useCreateExpense } from "../../../hooks/useExpenses";
-import {
-  CreateExpenseRequest,
-  UpdateExpenseRequest,
-} from "../../../lib/api/expenses";
 
 export default function AddExpensePage() {
   const router = useRouter();

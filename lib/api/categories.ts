@@ -1,4 +1,4 @@
-import { Category } from "../../types/category";
+import { Category } from "@/types/category";
 import { apiClient } from "./client";
 
 export interface CategoriesResponse {

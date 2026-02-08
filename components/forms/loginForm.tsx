@@ -1,21 +1,19 @@
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Colors } from "@/constants/colors";
 import { useAuth } from "@/contexts/AuthContext";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { Colors } from "../../constants/colors";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
 
 interface LoginFormData {
   email: string;
   password: string;
 }
 
-interface Props {}
-
-export const LoginForm: React.FC<Props> = (props) => {
+export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);

@@ -1,11 +1,9 @@
+import { Colors } from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constants/colors";
 
-interface Props {}
-
-export const HomeActions: React.FC<Props> = (props) => {
+export const HomeActions: React.FC = () => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Quick Actions</Text>

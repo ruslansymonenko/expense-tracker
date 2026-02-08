@@ -34,6 +34,7 @@ export default function AddExpensePage() {
       </View>
       <ExpenseForm
         onSubmit={handleSubmit}
+        onCancel={() => router.back()}
         isLoading={createExpense.isPending}
         submitLabel="Create Expense"
       />

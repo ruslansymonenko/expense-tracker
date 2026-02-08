@@ -23,6 +23,7 @@ interface ExpenseFormProps {
   readonly onSubmit: (
     data: CreateExpenseRequest | UpdateExpenseRequest,
   ) => void;
+  readonly onCancel?: () => void;
   readonly isLoading?: boolean;
   readonly submitLabel?: string;
 }
@@ -30,6 +31,7 @@ interface ExpenseFormProps {
 export function ExpenseForm({
   initialData,
   onSubmit,
+  onCancel,
   isLoading = false,
   submitLabel = "Save Expense",
 }: Readonly<ExpenseFormProps>) {
@@ -222,12 +224,23 @@ export function ExpenseForm({
           )}
         </View>
 
-        <Button
-          title={submitLabel}
-          onPress={handleSubmit}
-          disabled={isLoading}
-          style={styles.submitButton}
-        />
+        <View style={styles.buttonContainer}>
+          {onCancel && (
+            <Button
+              title="Cancel"
+              onPress={onCancel}
+              disabled={isLoading}
+              variant="outline"
+              style={styles.cancelButton}
+            />
+          )}
+          <Button
+            title={submitLabel}
+            onPress={handleSubmit}
+            disabled={isLoading}
+            style={styles.submitButton}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -316,7 +329,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
   },
-  submitButton: {
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 12,
     marginTop: 12,
+  },
+  cancelButton: {
+    flex: 1,
+  },
+  submitButton: {
+    flex: 1,
   },
 });

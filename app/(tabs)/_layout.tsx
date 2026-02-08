@@ -13,7 +13,7 @@ export default function TabsLayout() {
           backgroundColor: Colors.surface,
           borderTopColor: Colors.borderLight,
           borderTopWidth: 1,
-          height: 70,
+          height: 75,
           paddingBottom: 8,
           paddingTop: 8,
         },

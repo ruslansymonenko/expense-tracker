@@ -1,11 +1,11 @@
+import { ExpenseForm } from "@/components/forms/ExpenseForm";
+import { Colors } from "@/constants/colors";
+import { useExpense, useUpdateExpense } from "@/hooks/useExpenses";
+import { UpdateExpenseRequest } from "@/lib/api/expenses";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ExpenseForm } from "../../../components/forms/ExpenseForm";
-import { Colors } from "../../../constants/colors";
-import { useExpense, useUpdateExpense } from "../../../hooks/useExpenses";
-import { UpdateExpenseRequest } from "../../../lib/api/expenses";
 
 export default function EditExpensePage() {
   const { id } = useLocalSearchParams();

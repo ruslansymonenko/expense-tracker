@@ -1,16 +1,16 @@
 import {
+  CreateExpenseRequest,
+  expensesApi,
+  UpdateExpenseRequest,
+} from "@/lib/api/expenses";
+import { Expense } from "@/types/expense";
+import {
   useMutation,
   useQuery,
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
 import { Alert } from "react-native";
-import {
-  CreateExpenseRequest,
-  expensesApi,
-  UpdateExpenseRequest,
-} from "../lib/api/expenses";
-import { Expense } from "../types/expense";
 
 export const EXPENSES_QUERY_KEY = ["expenses"];
 

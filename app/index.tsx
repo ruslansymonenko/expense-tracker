@@ -1,8 +1,8 @@
+import { Colors } from "@/constants/colors";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { Colors } from "../constants/colors";
-import { useAuth } from "../contexts/AuthContext";
 
 export default function Index() {
   const { user, isLoading } = useAuth();
@@ -16,6 +16,7 @@ export default function Index() {
         router.replace("/login");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isLoading]);
 
   return (

@@ -2,6 +2,9 @@ import { HomeActions } from "@/components/blocks/HomeActions";
 import { HomeExpenses } from "@/components/blocks/HomeExpenses";
 import { HomeHeader } from "@/components/blocks/HomeHeader";
 import { HomeSummary } from "@/components/blocks/HomeSummary";
+import { Colors } from "@/constants/colors";
+import { useAuth } from "@/contexts/AuthContext";
+import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -13,9 +16,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "../../constants/colors";
-import { useAuth } from "../../contexts/AuthContext";
-import { useExpenses } from "../../hooks/useExpenses";
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();

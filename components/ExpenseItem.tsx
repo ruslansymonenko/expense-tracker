@@ -1,10 +1,10 @@
+import { Card } from "@/components/ui/Card";
+import { Colors } from "@/constants/colors";
+import { useCategories } from "@/hooks/useCategories";
+import { Expense } from "@/types/expense";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../constants/colors";
-import { useCategories } from "../hooks/useCategories";
-import { Expense } from "../types/expense";
-import { Card } from "./ui/Card";
 
 interface ExpenseItemProps {
   readonly expense: Expense;

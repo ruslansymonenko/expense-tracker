@@ -1,9 +1,9 @@
+import { ExpenseItem } from "@/components/ExpenseItem";
 import { Colors } from "@/constants/colors";
 import { Expense } from "@/types/expense";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ExpenseItem } from "../../components/ExpenseItem";
 
 interface Props {
   expenses: Expense[];

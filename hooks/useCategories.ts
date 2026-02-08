@@ -1,16 +1,16 @@
 import {
+  categoriesApi,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from "@/lib/api/categories";
+import { Category } from "@/types/category";
+import {
   useMutation,
   useQuery,
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
 import { Alert } from "react-native";
-import {
-  categoriesApi,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from "../lib/api/categories";
-import { Category } from "../types/category";
 
 export const CATEGORIES_QUERY_KEY = ["categories"];
 

@@ -13,7 +13,7 @@ export default function TabsLayout() {
           backgroundColor: Colors.surface,
           borderTopColor: Colors.borderLight,
           borderTopWidth: 1,
-          height: 70,
+          height: 75,
           paddingBottom: 8,
           paddingTop: 8,
         },
@@ -47,6 +47,24 @@ export default function TabsLayout() {
           title: "Transactions",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: "Reports",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="analytics" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />

@@ -1,14 +1,20 @@
 import { Colors } from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export const HomeActions: React.FC = () => {
+  const router = useRouter();
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Quick Actions</Text>
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push("/(tabs)/transactions/add")}
+        >
           <View
             style={[
               styles.actionIcon,
@@ -20,7 +26,10 @@ export const HomeActions: React.FC = () => {
           <Text style={styles.actionText}>Add Expense</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push("/(tabs)/reports")}
+        >
           <View
             style={[
               styles.actionIcon,
@@ -32,7 +41,10 @@ export const HomeActions: React.FC = () => {
           <Text style={styles.actionText}>View Reports</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push("/(tabs)/settings")}
+        >
           <View
             style={[
               styles.actionIcon,

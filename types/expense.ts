@@ -3,7 +3,7 @@ export interface Expense {
   title: string;
   amount: number;
   categoryId: string;
-  category?: string; // For display purposes, will be populated from categoryId
+  category?: string;
   date: Date | string;
   userId: string;
 }

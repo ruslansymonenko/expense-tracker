@@ -18,7 +18,7 @@ interface CategoryListItemProps {
   readonly onDelete: () => void;
 }
 
-export function CategoryListItem({
+export const CategoryListItem = React.memo(function CategoryListItem({
   category,
   total,
   count,
@@ -96,7 +96,9 @@ export function CategoryListItem({
       </Card>
     </TouchableOpacity>
   );
-}
+});
+
+CategoryListItem.displayName = "CategoryListItem";
 
 const styles = StyleSheet.create({
   card: {

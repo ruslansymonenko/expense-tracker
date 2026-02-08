@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const HomeActions: React.FC = () => {
+export const HomeActions: React.FC = React.memo(() => {
   const router = useRouter();
 
   return (
@@ -58,7 +58,9 @@ export const HomeActions: React.FC = () => {
       </View>
     </View>
   );
-};
+});
+
+HomeActions.displayName = "HomeActions";
 
 const styles = StyleSheet.create({
   section: {

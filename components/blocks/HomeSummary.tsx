@@ -9,37 +9,40 @@ interface Props {
   thisMonthExpenses: number;
 }
 
-export const HomeSummary: React.FC<Props> = ({
-  totalExpenses,
-  thisMonthExpenses,
-}) => {
-  return (
-    <View style={styles.summaryContainer}>
-      <Card style={StyleSheet.flatten([styles.summaryCard, styles.totalCard])}>
-        <View style={styles.summaryIconContainer}>
-          <Ionicons name="wallet" size={28} color="#fff" />
-        </View>
-        <Text style={styles.summaryLabel}>Total Expenses</Text>
-        <Text style={styles.summaryAmount}>${totalExpenses.toFixed(2)}</Text>
-      </Card>
-
-      <Card style={styles.summaryCard}>
-        <View
-          style={[
-            styles.summaryIconContainer,
-            { backgroundColor: Colors.secondary + "20" },
-          ]}
+export const HomeSummary: React.FC<Props> = React.memo(
+  ({ totalExpenses, thisMonthExpenses }) => {
+    return (
+      <View style={styles.summaryContainer}>
+        <Card
+          style={StyleSheet.flatten([styles.summaryCard, styles.totalCard])}
         >
-          <Ionicons name="calendar" size={28} color={Colors.secondary} />
-        </View>
-        <Text style={styles.summaryLabel}>This Month</Text>
-        <Text style={[styles.summaryAmount, { color: Colors.text }]}>
-          ${thisMonthExpenses.toFixed(2)}
-        </Text>
-      </Card>
-    </View>
-  );
-};
+          <View style={styles.summaryIconContainer}>
+            <Ionicons name="wallet" size={28} color="#fff" />
+          </View>
+          <Text style={styles.summaryLabel}>Total Expenses</Text>
+          <Text style={styles.summaryAmount}>${totalExpenses.toFixed(2)}</Text>
+        </Card>
+
+        <Card style={styles.summaryCard}>
+          <View
+            style={[
+              styles.summaryIconContainer,
+              { backgroundColor: Colors.secondary + "20" },
+            ]}
+          >
+            <Ionicons name="calendar" size={28} color={Colors.secondary} />
+          </View>
+          <Text style={styles.summaryLabel}>This Month</Text>
+          <Text style={[styles.summaryAmount, { color: Colors.text }]}>
+            ${thisMonthExpenses.toFixed(2)}
+          </Text>
+        </Card>
+      </View>
+    );
+  },
+);
+
+HomeSummary.displayName = "HomeSummary";
 
 const styles = StyleSheet.create({
   summaryContainer: {

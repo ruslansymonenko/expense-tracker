@@ -52,7 +52,6 @@ export function AuthProvider({
 
       setUser(response.user);
 
-      // Prefetch categories for better UX
       queryClient.prefetchQuery({
         queryKey: CATEGORIES_QUERY_KEY,
         queryFn: () => categoriesApi.getAll(),
@@ -82,7 +81,6 @@ export function AuthProvider({
 
       setUser(response.user);
 
-      // Prefetch categories for better UX
       queryClient.prefetchQuery({
         queryKey: CATEGORIES_QUERY_KEY,
         queryFn: () => categoriesApi.getAll(),

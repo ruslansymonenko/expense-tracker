@@ -10,22 +10,26 @@ interface StatCardProps {
   readonly label: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
-  icon,
-  iconColor,
-  value,
-  label,
-}) => {
-  return (
-    <View style={styles.statCard}>
-      <View style={[styles.statIcon, { backgroundColor: iconColor + "20" }]}>
-        <Ionicons name={icon} size={24} color={iconColor} />
+export const StatCard: React.FC<StatCardProps> = React.memo(
+  ({ icon, iconColor, value, label }) => {
+    const iconContainerStyle = React.useMemo(
+      () => [styles.statIcon, { backgroundColor: iconColor + "20" }],
+      [iconColor],
+    );
+
+    return (
+      <View style={styles.statCard}>
+        <View style={iconContainerStyle}>
+          <Ionicons name={icon} size={24} color={iconColor} />
+        </View>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
       </View>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-};
+    );
+  },
+);
+
+StatCard.displayName = "StatCard";
 
 const styles = StyleSheet.create({
   statCard: {

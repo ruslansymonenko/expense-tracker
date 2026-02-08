@@ -15,7 +15,7 @@ interface InputProps extends TextInputProps {
   readonly leftIcon?: React.ReactNode;
 }
 
-export function Input({
+export const Input = React.memo(function Input({
   label,
   error,
   icon,
@@ -24,15 +24,26 @@ export function Input({
   ...props
 }: Readonly<InputProps>) {
   const hasIcon = icon || leftIcon;
+
+  const inputContainerStyle = React.useMemo(
+    () => [styles.inputContainer, error && styles.inputError],
+    [error],
+  );
+
+  const inputStyle = React.useMemo(
+    () => [styles.input, hasIcon ? styles.inputWithIcon : null, style],
+    [hasIcon, style],
+  );
+
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={[styles.inputContainer, error && styles.inputError]}>
+      <View style={inputContainerStyle}>
         {(leftIcon || icon) && (
           <View style={styles.iconContainer}>{leftIcon || icon}</View>
         )}
         <TextInput
-          style={[styles.input, hasIcon ? styles.inputWithIcon : null, style]}
+          style={inputStyle}
           placeholderTextColor={Colors.textLight}
           {...props}
         />
@@ -40,7 +51,7 @@ export function Input({
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

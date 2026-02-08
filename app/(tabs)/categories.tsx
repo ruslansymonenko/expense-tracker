@@ -17,7 +17,7 @@ import {
 } from "@/lib/api/categories";
 import { Category } from "@/types/category";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -34,108 +34,131 @@ export default function CategoriesPage() {
 
   const isLoading = categoriesLoading || expensesLoading;
 
-  const getCategoryTotal = (categoryId: string) => {
-    return (
-      expenses
-        ?.filter((expense) => expense.categoryId === categoryId)
-        .reduce((sum, expense) => sum + expense.amount, 0) ?? 0
-    );
-  };
+  const getCategoryTotal = useCallback(
+    (categoryId: string) => {
+      return (
+        expenses
+          ?.filter((expense) => expense.categoryId === categoryId)
+          .reduce((sum, expense) => sum + expense.amount, 0) ?? 0
+      );
+    },
+    [expenses],
+  );
 
-  const getCategoryCount = (categoryId: string) => {
-    return (
-      expenses?.filter((expense) => expense.categoryId === categoryId).length ??
-      0
-    );
-  };
+  const getCategoryCount = useCallback(
+    (categoryId: string) => {
+      return (
+        expenses?.filter((expense) => expense.categoryId === categoryId)
+          .length ?? 0
+      );
+    },
+    [expenses],
+  );
 
-  const handleAddCategory = () => {
+  const handleAddCategory = useCallback(() => {
     setEditingCategory(null);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleEditCategory = (category: Category) => {
+  const handleEditCategory = useCallback((category: Category) => {
     setEditingCategory(category);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleDeleteCategory = (category: Category) => {
-    const count = getCategoryCount(category.id);
+  const handleDeleteCategory = useCallback(
+    (category: Category) => {
+      const count = getCategoryCount(category.id);
 
-    if (count > 0) {
+      if (count > 0) {
+        Alert.alert(
+          "Cannot Delete Category",
+          `This category has ${count} transaction${count === 1 ? "" : "s"}. Please reassign or delete those transactions first.`,
+          [{ text: "OK" }],
+        );
+        return;
+      }
+
       Alert.alert(
-        "Cannot Delete Category",
-        `This category has ${count} transaction${count === 1 ? "" : "s"}. Please reassign or delete those transactions first.`,
-        [{ text: "OK" }],
-      );
-      return;
-    }
-
-    Alert.alert(
-      "Delete Category",
-      `Are you sure you want to delete "${category.name}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteCategory.mutate(category.id);
+        "Delete Category",
+        `Are you sure you want to delete "${category.name}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => {
+              deleteCategory.mutate(category.id);
+            },
           },
-        },
-      ],
-    );
-  };
+        ],
+      );
+    },
+    [getCategoryCount, deleteCategory],
+  );
 
-  const handleSubmitCategory = (
-    data: CreateCategoryRequest | UpdateCategoryRequest,
-  ) => {
-    if (editingCategory) {
-      updateCategory.mutate(
-        { id: editingCategory.id, data },
-        {
+  const handleSubmitCategory = useCallback(
+    (data: CreateCategoryRequest | UpdateCategoryRequest) => {
+      if (editingCategory) {
+        updateCategory.mutate(
+          { id: editingCategory.id, data },
+          {
+            onSuccess: () => {
+              setModalVisible(false);
+              setEditingCategory(null);
+            },
+          },
+        );
+      } else {
+        createCategory.mutate(data as CreateCategoryRequest, {
           onSuccess: () => {
             setModalVisible(false);
-            setEditingCategory(null);
           },
-        },
-      );
-    } else {
-      createCategory.mutate(data as CreateCategoryRequest, {
-        onSuccess: () => {
-          setModalVisible(false);
-        },
-      });
-    }
-  };
+        });
+      }
+    },
+    [editingCategory, updateCategory, createCategory],
+  );
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setModalVisible(false);
     setEditingCategory(null);
-  };
+  }, []);
 
-  const totalExpenses =
-    expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+  const totalExpenses = useMemo(
+    () => expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0,
+    [expenses],
+  );
 
-  const renderCategoryItem = ({ item }: { item: Category }) => {
-    const total = getCategoryTotal(item.id);
-    const count = getCategoryCount(item.id);
-    const isSelected = selectedCategory === item.id;
+  // eslint-disable-next-line react/display-name
+  const renderCategoryItem = useCallback(
+    ({ item }: { item: Category }) => {
+      const total = getCategoryTotal(item.id);
+      const count = getCategoryCount(item.id);
+      const isSelected = selectedCategory === item.id;
 
-    return (
-      <CategoryListItem
-        category={item}
-        total={total}
-        count={count}
-        isSelected={isSelected}
-        totalExpenses={totalExpenses}
-        onPress={() => setSelectedCategory(isSelected ? null : item.id)}
-        onLongPress={() => handleEditCategory(item)}
-        onEdit={() => handleEditCategory(item)}
-        onDelete={() => handleDeleteCategory(item)}
-      />
-    );
-  };
+      return (
+        <CategoryListItem
+          category={item}
+          total={total}
+          count={count}
+          isSelected={isSelected}
+          totalExpenses={totalExpenses}
+          onPress={() => setSelectedCategory(isSelected ? null : item.id)}
+          onLongPress={() => handleEditCategory(item)}
+          onEdit={() => handleEditCategory(item)}
+          onDelete={() => handleDeleteCategory(item)}
+        />
+      );
+    },
+    [
+      selectedCategory,
+      getCategoryTotal,
+      getCategoryCount,
+      totalExpenses,
+      handleEditCategory,
+      handleDeleteCategory,
+    ],
+  );
 
   if (isLoading) {
     return (
@@ -171,6 +194,10 @@ export default function CategoriesPage() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={8}
+        windowSize={8}
+        initialNumToRender={8}
       />
 
       <CategoryModal

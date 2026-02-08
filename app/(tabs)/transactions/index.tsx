@@ -4,7 +4,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -20,40 +20,67 @@ export default function TransactionsPage() {
   const { data: expenses, isLoading, error } = useExpenses();
   const { data: categories } = useCategories();
 
-  const handleTransactionPress = (id: string) => {
-    router.push(`/(tabs)/transactions/${id}` as any);
-  };
+  const handleTransactionPress = useCallback(
+    (id: string) => {
+      router.push(`/(tabs)/transactions/${id}` as any);
+    },
+    [router],
+  );
 
-  const thisMonthCount =
-    expenses?.filter((e) => {
-      const expenseDate = e.date instanceof Date ? e.date : new Date(e.date);
-      return expenseDate.getMonth() === new Date().getMonth();
-    }).length ?? 0;
+  const handleAddTransaction = useCallback(() => {
+    router.push("/(tabs)/transactions/add" as any);
+  }, [router]);
 
-  const totalAmount = expenses?.reduce((sum, e) => sum + e.amount, 0) ?? 0;
+  const thisMonthCount = useMemo(
+    () =>
+      expenses?.filter((e) => {
+        const expenseDate = e.date instanceof Date ? e.date : new Date(e.date);
+        return expenseDate.getMonth() === new Date().getMonth();
+      }).length ?? 0,
+    [expenses],
+  );
 
-  const renderHeader = () => (
-    <>
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statLabel}>Total</Text>
-          <Text style={styles.statValue}>{expenses?.length ?? 0}</Text>
+  const totalAmount = useMemo(
+    () => expenses?.reduce((sum, e) => sum + e.amount, 0) ?? 0,
+    [expenses],
+  );
+
+  const renderHeader = useCallback(
+    () => (
+      <>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Total</Text>
+            <Text style={styles.statValue}>{expenses?.length ?? 0}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>This Month</Text>
+            <Text style={styles.statValue}>{thisMonthCount}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Amount</Text>
+            <Text style={[styles.statValue, { color: Colors.primary }]}>
+              ${totalAmount.toFixed(0)}
+            </Text>
+          </View>
         </View>
-        <View style={styles.divider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statLabel}>This Month</Text>
-          <Text style={styles.statValue}>{thisMonthCount}</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statLabel}>Amount</Text>
-          <Text style={[styles.statValue, { color: Colors.primary }]}>
-            ${totalAmount.toFixed(0)}
-          </Text>
-        </View>
-      </View>
-      <Text style={styles.sectionTitle}>All Transactions</Text>
-    </>
+        <Text style={styles.sectionTitle}>All Transactions</Text>
+      </>
+    ),
+    [expenses, thisMonthCount, totalAmount],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: any) => (
+      <ExpenseItem
+        expense={item}
+        categories={categories}
+        onPress={() => handleTransactionPress(item.id)}
+      />
+    ),
+    [categories, handleTransactionPress],
   );
 
   if (isLoading) {
@@ -100,22 +127,20 @@ export default function TransactionsPage() {
 
       <FlatList
         data={expenses}
-        renderItem={({ item }) => (
-          <ExpenseItem
-            expense={item}
-            categories={categories}
-            onPress={() => handleTransactionPress(item.id)}
-          />
-        )}
+        renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={renderHeader}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        initialNumToRender={10}
       />
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => router.push("/(tabs)/transactions/add" as any)}
+        onPress={handleAddTransaction}
         activeOpacity={0.8}
       >
         <Ionicons name="add" size={28} color={Colors.surface} />

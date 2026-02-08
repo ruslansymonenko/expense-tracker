@@ -7,7 +7,7 @@ interface LoadingStateProps {
   readonly size?: "small" | "large";
 }
 
-export function LoadingState({
+export const LoadingState = React.memo(function LoadingState({
   message = "Loading...",
   size = "large",
 }: Readonly<LoadingStateProps>) {
@@ -17,7 +17,7 @@ export function LoadingState({
       <Text style={styles.text}>{message}</Text>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

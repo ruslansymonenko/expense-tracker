@@ -45,6 +45,13 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
+    "jsEngine": "hermes",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
     "extra": {
       "router": {},
       "eas": {

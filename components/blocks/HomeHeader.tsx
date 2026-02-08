@@ -8,19 +8,23 @@ interface Props {
   onLogout: () => void;
 }
 
-export const HomeHeader: React.FC<Props> = ({ userName, onLogout }) => {
-  return (
-    <View style={styles.header}>
-      <View>
-        <Text style={styles.greeting}>Hello,</Text>
-        <Text style={styles.userName}>{userName || "User"}</Text>
+export const HomeHeader: React.FC<Props> = React.memo(
+  ({ userName, onLogout }) => {
+    return (
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Hello,</Text>
+          <Text style={styles.userName}>{userName || "User"}</Text>
+        </View>
+        <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
+          <Ionicons name="log-out-outline" size={24} color={Colors.error} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
-        <Ionicons name="log-out-outline" size={24} color={Colors.error} />
-      </TouchableOpacity>
-    </View>
-  );
-};
+    );
+  },
+);
+
+HomeHeader.displayName = "HomeHeader";
 
 const styles = StyleSheet.create({
   header: {

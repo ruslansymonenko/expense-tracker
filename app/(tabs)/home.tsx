@@ -8,7 +8,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { useExpenses } from "@/hooks/useExpenses";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -23,6 +23,14 @@ export default function HomeScreen() {
   const { user, logout } = useAuth();
   const { data: expenses, isLoading, error } = useExpenses();
   const { data: categories } = useCategories();
+
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
+
+  const handleAddExpense = useCallback(() => {
+    router.push("/transactions/add");
+  }, []);
 
   const totalExpenses = useMemo(
     () => expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0,
@@ -45,7 +53,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HomeHeader userName={user?.name || "User"} onLogout={logout} />
+      <HomeHeader userName={user?.name || "User"} onLogout={handleLogout} />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <HomeSummary
@@ -81,10 +89,7 @@ export default function HomeScreen() {
         <View style={styles.bottomSpacing} />
       </ScrollView>
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push("/transactions/add")}
-      >
+      <TouchableOpacity style={styles.fab} onPress={handleAddExpense}>
         <Ionicons name="add" size={32} color="#fff" />
       </TouchableOpacity>
     </SafeAreaView>

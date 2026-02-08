@@ -18,8 +18,8 @@ export function useCategories(): UseQueryResult<Category[], Error> {
   return useQuery({
     queryKey: CATEGORIES_QUERY_KEY,
     queryFn: () => categoriesApi.getAll(),
-    staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
-    gcTime: 30 * 60 * 1000, // 30 minutes cache time
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 }
 

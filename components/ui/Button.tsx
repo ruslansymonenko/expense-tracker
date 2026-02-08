@@ -17,7 +17,7 @@ interface ButtonProps {
   readonly style?: ViewStyle;
 }
 
-export function Button({
+export const Button = React.memo(function Button({
   title,
   onPress,
   variant = "primary",
@@ -57,7 +57,9 @@ export function Button({
       )}
     </TouchableOpacity>
   );
-}
+});
+
+Button.displayName = "Button";
 
 const styles = StyleSheet.create({
   button: {

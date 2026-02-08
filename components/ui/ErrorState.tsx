@@ -10,7 +10,7 @@ interface ErrorStateProps {
   readonly retryLabel?: string;
 }
 
-export function ErrorState({
+export const ErrorState = React.memo(function ErrorState({
   message,
   subMessage,
   onRetry,
@@ -28,7 +28,7 @@ export function ErrorState({
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

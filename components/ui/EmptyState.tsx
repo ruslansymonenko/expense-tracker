@@ -11,7 +11,7 @@ interface EmptyStateProps {
   readonly onAction?: () => void;
 }
 
-export function EmptyState({
+export const EmptyState = React.memo(function EmptyState({
   icon = "folder-open-outline",
   message,
   subMessage,
@@ -30,7 +30,7 @@ export function EmptyState({
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

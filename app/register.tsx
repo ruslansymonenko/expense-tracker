@@ -1,4 +1,4 @@
-import { RegisterForm } from "@/components/forms/registerForm";
+import { RegisterForm } from "@/components/forms/RegisterForm";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {

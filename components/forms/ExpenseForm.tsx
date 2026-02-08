@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -198,11 +200,27 @@ export function ExpenseForm({
             <Text style={styles.dateButtonText}>{formatDate(date)}</Text>
           </TouchableOpacity>
           {showDatePicker && (
-            <View style={styles.datePickerInfo}>
-              <Text style={styles.datePickerText}>
-                Date picker requires @react-native-community/datetimepicker.
-                Currently showing: {formatDate(date)}
-              </Text>
+            <View style={styles.datePickerContainer}>
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={(event, selectedDate) => {
+                  if (Platform.OS === "android") {
+                    setShowDatePicker(false);
+                  }
+                  if (selectedDate) {
+                    setDate(selectedDate);
+                  }
+                }}
+              />
+              {Platform.OS === "ios" && (
+                <Button
+                  title="Done"
+                  onPress={() => setShowDatePicker(false)}
+                  style={styles.datePickerDoneButton}
+                />
+              )}
             </View>
           )}
         </View>
@@ -286,15 +304,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     gap: 12,
   },
-  datePickerInfo: {
-    marginTop: 8,
+  datePickerContainer: {
+    marginTop: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
     padding: 12,
-    backgroundColor: Colors.warning + "20",
-    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
-  datePickerText: {
-    fontSize: 13,
-    color: Colors.text,
+  datePickerDoneButton: {
+    marginTop: 8,
   },
   dateButtonText: {
     fontSize: 16,

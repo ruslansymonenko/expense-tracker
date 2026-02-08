@@ -4,8 +4,8 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, StyleSheet, Text, View } from "react-native";
-import { Button } from "../../components/ui/Button";
 import { Colors } from "../../constants/colors";
+import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 
 interface LoginFormData {

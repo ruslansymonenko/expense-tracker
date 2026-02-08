@@ -2,9 +2,16 @@ import { ExpenseForm } from "@/components/forms/ExpenseForm";
 import { Colors } from "@/constants/colors";
 import { useExpense, useUpdateExpense } from "@/hooks/useExpenses";
 import { UpdateExpenseRequest } from "@/lib/api/expenses";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditExpensePage() {
@@ -46,13 +53,21 @@ export default function EditExpensePage() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Expense</Text>
+        <View style={styles.placeholder} />
       </View>
       <ExpenseForm
         initialData={expense}
         onSubmit={handleSubmit}
+        onCancel={() => router.back()}
         isLoading={updateExpense.isPending}
         submitLabel="Update Expense"
       />
@@ -66,14 +81,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
     color: Colors.text,
+  },
+  placeholder: {
+    width: 40,
   },
   loadingContainer: {
     flex: 1,

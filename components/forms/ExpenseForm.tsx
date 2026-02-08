@@ -50,6 +50,15 @@ export function ExpenseForm({
   const [date, setDate] = useState(getInitialDate());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const resetForm = () => {
+    setTitle("");
+    setAmount("");
+    setCategoryId("");
+    setDate(new Date());
+    setShowDatePicker(false);
+    setErrors({});
+  };
+
   const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   const [errors, setErrors] = useState<{
@@ -92,6 +101,15 @@ export function ExpenseForm({
     };
 
     onSubmit(data);
+
+    if (!initialData) {
+      resetForm();
+    }
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    onCancel?.();
   };
 
   const formatDate = (date: Date) => {
@@ -204,6 +222,8 @@ export function ExpenseForm({
                 value={date}
                 mode="date"
                 display={Platform.OS === "ios" ? "spinner" : "default"}
+                themeVariant="light"
+                textColor={Colors.text}
                 onChange={(event, selectedDate) => {
                   if (Platform.OS === "android") {
                     setShowDatePicker(false);
@@ -228,7 +248,7 @@ export function ExpenseForm({
           {onCancel && (
             <Button
               title="Cancel"
-              onPress={onCancel}
+              onPress={handleCancel}
               disabled={isLoading}
               variant="outline"
               style={styles.cancelButton}

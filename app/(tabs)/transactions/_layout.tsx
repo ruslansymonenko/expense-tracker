@@ -13,6 +13,20 @@ export default function TransactionsLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen
+        name="add"
+        options={{
+          headerShown: false,
+          presentation: "card",
+        }}
+      />
+      <Stack.Screen
+        name="edit"
+        options={{
+          headerShown: false,
+          presentation: "card",
+        }}
+      />
+      <Stack.Screen
         name="[id]"
         options={{
           headerShown: true,

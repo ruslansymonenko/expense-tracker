@@ -32,7 +32,7 @@ export const HomeSummary: React.FC<Props> = React.memo(
           >
             <Ionicons name="calendar" size={28} color={Colors.secondary} />
           </View>
-          <Text style={styles.summaryLabel}>This Month</Text>
+          <Text style={styles.summaryLabel}>Monthly Expenses</Text>
           <Text style={[styles.summaryAmount, { color: Colors.text }]}>
             ${thisMonthExpenses.toFixed(2)}
           </Text>
@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 13,
-    color: "#fff",
     marginBottom: 4,
     opacity: 0.9,
   },

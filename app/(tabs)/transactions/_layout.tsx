@@ -17,6 +17,7 @@ export default function TransactionsLayout() {
         options={{
           headerShown: true,
           headerTitle: "Transaction Details",
+          headerBackTitle: "Back",
           headerStyle: {
             backgroundColor: Colors.surface,
           },

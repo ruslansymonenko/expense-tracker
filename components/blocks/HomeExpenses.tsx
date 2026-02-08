@@ -29,6 +29,7 @@ export const HomeExpenses: React.FC<Props> = React.memo(
             key={expense.id}
             expense={expense}
             categories={categories}
+            onPress={() => router.push(`/(tabs)/transactions/${expense.id}`)}
           />
         ))}
       </View>
